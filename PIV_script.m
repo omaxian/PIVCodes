@@ -1,9 +1,10 @@
-theFiles = dir(fullfile('Rachel/PIV_Oct2024/'));
+theFiles = dir(fullfile('PIVFiles'));
 dt = 1.0;
 interpModel=1;
 nEm=length(theFiles);
 NumErs=zeros(nEm,1);
 for i = 4:nEm  % loop through files called e1.tif, e2.tif, ...
+    %for index, needs to be 3 or 4.  If 3 and loop skips image file 1, change to 4
     FrameErs{i}=[];
     %filename=strcat("240829_myo_wt",num2str(i),".tif");
     filename = theFiles(i).name;
@@ -13,7 +14,7 @@ for i = 4:nEm  % loop through files called e1.tif, e2.tif, ...
     % read in first and second frames
     AllNan=1;
     St=1;
-    while (AllNan)
+    while (AllNan && St <nfrm)
         im1 = imread(filename,St);
         im2 = imread(filename,St+1);
     
@@ -26,7 +27,10 @@ for i = 4:nEm  % loop through files called e1.tif, e2.tif, ...
             St=St+1;
         end
     end
-
+    if (St==nfrm)
+        ru=nan;rv=nan;xi=nan;yi=nan;FrameErs{i}=1:nfrm;
+    else
+    
     % allocate storage for PIV vector fields (r) and averages (m)
     ru = zeros(nfrm-1,size(iv_ip,1),size(iv_ip,2));
     rv = zeros(nfrm-1,size(iv_ip,1),size(iv_ip,2));
@@ -61,6 +65,7 @@ for i = 4:nEm  % loop through files called e1.tif, e2.tif, ...
         end
         ru(j-1,:,:) = iu_ip;
         rv(j-1,:,:) = iv_ip;
+    end
     end
 
     % save data
